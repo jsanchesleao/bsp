@@ -5,8 +5,6 @@ import (
 	"fmt"
 )
 
-const fps = 60
-
 func main() {
 
 	sdlRenderer, err := bsp.NewSDLRenderer("BSP Test", 300, 200, 4)
@@ -17,61 +15,58 @@ func main() {
 
 	bsp.Init()
 
-	game := bsp.NewGame(Update, Render, 60, &sdlRenderer)
+	update := func(game *bsp.Game) {
+		game.UpdatePlayerPosition()
+	}
+
+	game := bsp.NewGame(update, render, 30, &sdlRenderer)
+
+	game.Player.X = 70
+	game.Player.Y = 110
+	game.Player.Z = 20
+	game.Player.Angle = 0
+	game.Player.Look = 0
 
 	game.Loop()
 }
 
-var x, y = 0, 0
+func render(game *bsp.Game) {
+	var wx, wy, wz [4]int32
+	HalfWidth := game.Renderer.GetWidth() / 2
+	HalfHeight := game.Renderer.GetHeight() / 2
+	CS := bsp.Cos[game.Player.Angle]
+	SN := bsp.Sin[game.Player.Angle]
 
-func Update(game *bsp.Game) {
-	if game.Inputs.M {
-		if game.Inputs.A {
-			fmt.Println("look down")
-		}
-		if game.Inputs.D {
-			fmt.Println("loop up")
-		}
-		if game.Inputs.W {
-			fmt.Println("move up")
-		}
-		if game.Inputs.S {
-			fmt.Println("move down")
-		}
-	} else {
-		if game.Inputs.A {
-			x--
-			fmt.Println("left")
-		}
-		if game.Inputs.D {
-			x++
-			fmt.Println("right")
-		}
-		if game.Inputs.W {
-			y++
-			fmt.Println("up")
-		}
-		if game.Inputs.S {
-			y--
-			fmt.Println("down")
-		}
+	x1 := 40 - game.Player.X
+	y1 := 10 - game.Player.Y
+	x2 := 40 - game.Player.X
+	y2 := 290 - game.Player.Y
+
+	//world x position
+	wx[0] = int32(float64(x1)*CS) - int32(float64(y1)*SN)
+	wx[1] = int32(float64(x2)*CS) - int32(float64(y2)*SN)
+
+	//world y position
+	wy[0] = int32(float64(y1)*CS) - int32(float64(x1)*SN)
+	wy[1] = int32(float64(y2)*CS) - int32(float64(x2)*SN)
+
+	//world height
+	wz[0] = 0 - game.Player.Z + ((int32(game.Player.Look) * wy[0]) / 32)
+	wz[1] = 0 - game.Player.Z + ((int32(game.Player.Look) * wy[1]) / 32)
+
+	//screen positions
+	wx[0] = wx[0]*200/wy[0] + HalfWidth
+	wy[0] = wz[0]*200/wy[0] + HalfHeight
+	wx[1] = wx[1]*200/wy[1] + HalfWidth
+	wy[1] = wz[1]*200/wy[1] + HalfHeight
+
+	//draw points
+	color := bsp.Color{R: 255, G: 0, B: 0}
+	if wx[0] > 0 && wx[0] < game.Renderer.GetWidth() && wy[0] > 0 && wy[0] < game.Renderer.GetHeight() {
+		game.Renderer.DrawPixel(&color, &bsp.Position{X: wx[0], Y: wy[0]})
 	}
-	if game.Inputs.COMMA {
-		fmt.Println("strafe left")
-	}
-	if game.Inputs.DOT {
-		fmt.Println("strafe right")
+	if wx[1] > 0 && wx[1] < game.Renderer.GetWidth() && wy[1] > 0 && wy[1] < game.Renderer.GetHeight() {
+		game.Renderer.DrawPixel(&color, &bsp.Position{X: wx[1], Y: wy[1]})
 	}
 
-	if x < 0 {
-		x = 0
-	}
-	if y < 0 {
-		y = 0
-	}
-
-}
-
-func Render(game *bsp.Game) {
-	game.Renderer.DrawPixel(&bsp.Color{R: 200, G: 0, B: 0}, &bsp.Position{X: int32(x), Y: int32(y)})
 }

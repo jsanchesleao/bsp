@@ -6,8 +6,8 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-var sin [360]float64
-var cos [360]float64
+var Sin [360]float64
+var Cos [360]float64
 
 type Game struct {
 	Inputs   Inputs
@@ -36,6 +36,8 @@ type Renderer interface {
 	Clear(*Color)
 	DrawPixel(*Color, *Position)
 	Loop(*Game)
+	GetWidth() int32
+	GetHeight() int32
 }
 
 type Color struct {
@@ -64,7 +66,7 @@ func (game *Game) Loop() {
 func Init() {
 	for x := 0; x < 360; x++ {
 		rads := float64(x) * math.Pi / 180
-		sin[x] = math.Sin(rads)
-		cos[x] = math.Cos(rads)
+		Sin[x] = math.Sin(rads)
+		Cos[x] = math.Cos(rads)
 	}
 }

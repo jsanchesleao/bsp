@@ -44,6 +44,14 @@ func NewSDLRenderer(title string, width int, height int, scale int) (SDLRenderer
 	return sdlRenderer, nil
 }
 
+func (s *SDLRenderer) GetWidth() int32 {
+	return int32(s.width)
+}
+
+func (s *SDLRenderer) GetHeight() int32 {
+	return int32(s.height)
+}
+
 func (s *SDLRenderer) DrawPixel(c *Color, p *Position) {
 	s.renderer.SetDrawColor(c.R, c.G, c.B, 255)
 	s.renderer.FillRect(&sdl.Rect{

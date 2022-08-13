@@ -3,61 +3,31 @@ package main
 import (
 	"bsp/bsp"
 	"fmt"
-
-	"github.com/veandco/go-sdl2/sdl"
 )
 
 const fps = 60
 
 func main() {
 
-	window, err := sdl.CreateWindow("bsp", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, 800, 600, sdl.WINDOW_SHOWN)
+	sdlRenderer, err := bsp.NewSDLRenderer("BSP Test", 300, 200, 4)
 	if err != nil {
 		panic(err)
 	}
-	defer window.Destroy()
-
-	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
-	if err != nil {
-		panic(err)
-	}
-	defer renderer.Destroy()
+	//defer sdlRenderer.Destroy()
 
 	game := bsp.Game{
-		Inputs:      bsp.Inputs{},
-		Update:      Update,
-		Render:      Render,
-		HandleEvent: HandleEvent,
+		Scale:    5,
+		Inputs:   bsp.Inputs{},
+		Update:   Update,
+		Render:   Render,
+		FPS:      60,
+		Renderer: &sdlRenderer,
 	}
 
-	bsp.GameLoop(renderer, &game, 60)
-
+	game.Loop()
 }
 
-func HandleEvent(game *bsp.Game, event sdl.Event) {
-	switch t := event.(type) {
-	case *sdl.KeyboardEvent:
-		if t.Repeat > 0 {
-			break
-		}
-		switch t.Keysym.Sym {
-		case 119:
-			game.Inputs.W = (t.State == sdl.PRESSED)
-		case 97:
-			game.Inputs.A = (t.State == sdl.PRESSED)
-		case 115:
-			game.Inputs.S = (t.State == sdl.PRESSED)
-		case 100:
-			game.Inputs.D = (t.State == sdl.PRESSED)
-		case 109:
-			game.Inputs.M = (t.State == sdl.PRESSED)
-		case 44:
-			game.Inputs.COMMA = (t.State == sdl.PRESSED)
-		case 46:
-			game.Inputs.DOT = (t.State == sdl.PRESSED)
-		}
-	}
-}
+var x, y = 0, 0
 
 func Update(game *bsp.Game) {
 	if game.Inputs.M {
@@ -75,15 +45,19 @@ func Update(game *bsp.Game) {
 		}
 	} else {
 		if game.Inputs.A {
+			x--
 			fmt.Println("left")
 		}
 		if game.Inputs.D {
+			x++
 			fmt.Println("right")
 		}
 		if game.Inputs.W {
+			y--
 			fmt.Println("up")
 		}
 		if game.Inputs.S {
+			y++
 			fmt.Println("down")
 		}
 	}
@@ -93,9 +67,16 @@ func Update(game *bsp.Game) {
 	if game.Inputs.DOT {
 		fmt.Println("strafe right")
 	}
+
+	if x < 0 {
+		x = 0
+	}
+	if y < 0 {
+		y = 0
+	}
+
 }
 
-func Render(game *bsp.Game, r *sdl.Renderer) {
-	r.SetDrawColor(255, 0, 0, 255)
-	r.FillRect(&sdl.Rect{X: 10, Y: 10, W: 50, H: 50})
+func Render(game *bsp.Game) {
+	game.Renderer.DrawPixel(&bsp.Color{R: 200, G: 0, B: 0}, &bsp.Position{X: int32(x), Y: int32(y)})
 }

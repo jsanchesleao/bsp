@@ -1,15 +1,27 @@
 package bsp
 
-import "github.com/veandco/go-sdl2/sdl"
+import (
+	"math"
+
+	"github.com/veandco/go-sdl2/sdl"
+)
+
+var sin [360]float64
+var cos [360]float64
 
 type Game struct {
-	Scale       int
-	Inputs      Inputs
-	Update      UpdateFunc
-	Render      RenderFunc
-	HandleEvent HandleEventFunc
-	FPS         int
-	Renderer    Renderer
+	Inputs   Inputs
+	Update   UpdateFunc
+	Render   RenderFunc
+	FPS      int
+	Renderer Renderer
+	Player   Player
+}
+
+type Player struct {
+	X, Y, Z int32
+	Angle   int
+	Look    int
 }
 
 type UpdateFunc func(*Game)
@@ -34,6 +46,25 @@ type Position struct {
 	X, Y int32
 }
 
+func NewGame(update UpdateFunc, render RenderFunc, fps int, renderer Renderer) *Game {
+	return &Game{
+		Inputs:   Inputs{},
+		Update:   update,
+		Render:   render,
+		FPS:      fps,
+		Renderer: renderer,
+		Player:   Player{},
+	}
+}
+
 func (game *Game) Loop() {
 	game.Renderer.Loop(game)
+}
+
+func Init() {
+	for x := 0; x < 360; x++ {
+		rads := float64(x) * math.Pi / 180
+		sin[x] = math.Sin(rads)
+		cos[x] = math.Cos(rads)
+	}
 }

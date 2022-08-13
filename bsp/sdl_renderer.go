@@ -7,6 +7,8 @@ import (
 )
 
 type SDLRenderer struct {
+	width    int
+	height   int
 	window   *sdl.Window
 	renderer *sdl.Renderer
 	scale    int
@@ -14,7 +16,11 @@ type SDLRenderer struct {
 
 func NewSDLRenderer(title string, width int, height int, scale int) (SDLRenderer, error) {
 
-	sdlRenderer := SDLRenderer{scale: scale}
+	sdlRenderer := SDLRenderer{
+		scale:  scale,
+		width:  width,
+		height: height,
+	}
 
 	window, err := sdl.CreateWindow(
 		title,
@@ -42,7 +48,7 @@ func (s *SDLRenderer) DrawPixel(c *Color, p *Position) {
 	s.renderer.SetDrawColor(c.R, c.G, c.B, 255)
 	s.renderer.FillRect(&sdl.Rect{
 		X: p.X * int32(s.scale),
-		Y: p.Y * int32(s.scale),
+		Y: (int32(s.height) - p.Y) * int32(s.scale),
 		W: int32(s.scale),
 		H: int32(s.scale),
 	})

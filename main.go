@@ -13,16 +13,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	//defer sdlRenderer.Destroy()
+	defer sdlRenderer.Destroy()
 
-	game := bsp.Game{
-		Scale:    5,
-		Inputs:   bsp.Inputs{},
-		Update:   Update,
-		Render:   Render,
-		FPS:      60,
-		Renderer: &sdlRenderer,
-	}
+	bsp.Init()
+
+	game := bsp.NewGame(Update, Render, 60, &sdlRenderer)
 
 	game.Loop()
 }
@@ -53,11 +48,11 @@ func Update(game *bsp.Game) {
 			fmt.Println("right")
 		}
 		if game.Inputs.W {
-			y--
+			y++
 			fmt.Println("up")
 		}
 		if game.Inputs.S {
-			y++
+			y--
 			fmt.Println("down")
 		}
 	}

@@ -1,34 +1,39 @@
 package bsp
 
+var movSpeed = 5.0
+var angleSpeed = 4
+var lookSpeed = 1
+var zSpeed int32 = 4
+
 func (game *Game) UpdatePlayerPosition() {
 	if game.Inputs.M {
 		if game.Inputs.A {
-			game.Player.Look -= 1
+			game.Player.Look -= lookSpeed
 		}
 		if game.Inputs.D {
-			game.Player.Look += 1
+			game.Player.Look += lookSpeed
 		}
 		if game.Inputs.W {
-			game.Player.Z += 4
+			game.Player.Z += zSpeed
 		}
 		if game.Inputs.S {
-			game.Player.Z -= 4
+			game.Player.Z -= zSpeed
 		}
 	} else {
 		if game.Inputs.A {
-			game.Player.Angle -= 4
+			game.Player.Angle -= angleSpeed
 			if game.Player.Angle < 0 {
 				game.Player.Angle += 360
 			}
 		}
 		if game.Inputs.D {
-			game.Player.Angle += 4
+			game.Player.Angle += angleSpeed
 			if game.Player.Angle >= 360 {
 				game.Player.Angle -= 360
 			}
 		}
-		dx := Sin[game.Player.Angle] * 10
-		dy := Cos[game.Player.Angle] * 10
+		dx := Sin[game.Player.Angle] * movSpeed
+		dy := Cos[game.Player.Angle] * movSpeed
 		if game.Inputs.W {
 			game.Player.X += int32(dx)
 			game.Player.Y += int32(dy)
@@ -38,8 +43,8 @@ func (game *Game) UpdatePlayerPosition() {
 			game.Player.Y -= int32(dy)
 		}
 	}
-	dx := Sin[game.Player.Angle] * 10
-	dy := Cos[game.Player.Angle] * 10
+	dx := Sin[game.Player.Angle] * movSpeed
+	dy := Cos[game.Player.Angle] * movSpeed
 	if game.Inputs.COMMA {
 		game.Player.X -= int32(dy)
 		game.Player.Y += int32(dx)

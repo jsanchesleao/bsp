@@ -1,7 +1,7 @@
 package bsp
 
-var movSpeed = 5.0
-var angleSpeed = 4
+var movSpeed = 3.0
+var angleSpeed = 2
 var lookSpeed = 1
 var zSpeed int32 = 4
 

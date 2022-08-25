@@ -1,6 +1,7 @@
 package bsp
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/veandco/go-sdl2/sdl"
@@ -12,6 +13,7 @@ type SDLRenderer struct {
 	window   *sdl.Window
 	renderer *sdl.Renderer
 	scale    int
+	ppf      int32
 }
 
 func NewSDLRenderer(title string, width int, height int, scale int) (SDLRenderer, error) {
@@ -53,6 +55,7 @@ func (s *SDLRenderer) GetHeight() int32 {
 }
 
 func (s *SDLRenderer) DrawPixel(c *Color, p *Position) {
+	s.ppf++
 	s.renderer.SetDrawColor(c.R, c.G, c.B, 255)
 	s.renderer.FillRect(&sdl.Rect{
 		X: p.X * int32(s.scale),
@@ -100,9 +103,11 @@ func (s *SDLRenderer) Loop(game *Game) {
 		now := time.Now().UnixMilli()
 		game.Update(game)
 		if skips == 0 {
+			s.ppf = 0
 			game.Render(game)
 			s.renderer.Present()
 		} else {
+			fmt.Printf("skip. %d\n", s.ppf)
 			skips--
 		}
 
